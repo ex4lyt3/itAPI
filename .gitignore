@@ -1,3 +1,4 @@
 src/node_modules
 src/node_modules/*
-src/config/apiConfig.js
+src/config/apiConfig.js 
+## store api keys in env or somewhere else secure next time
