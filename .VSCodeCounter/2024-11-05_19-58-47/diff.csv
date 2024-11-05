@@ -1,0 +1,12 @@
+"filename", "language", "JavaScript", "JSON", "comment", "blank", "total"
+"c:\Users\quant\Desktop\Gachon stuff\WebDB\itAPI\src\config\apiConfig.js", "JavaScript", 0, 0, 1, 0, 1
+"c:\Users\quant\Desktop\Gachon stuff\WebDB\itAPI\src\controllers\itineraryController.js", "JavaScript", 18, 0, 0, 3, 21
+"c:\Users\quant\Desktop\Gachon stuff\WebDB\itAPI\src\package-lock.json", "JSON", 0, 334, 0, 0, 334
+"c:\Users\quant\Desktop\Gachon stuff\WebDB\itAPI\src\package.json", "JSON", 0, 4, 0, 0, 4
+"c:\Users\quant\Desktop\Gachon stuff\WebDB\itAPI\src\routes\itineraryRoutes.js", "JavaScript", 5, 0, 0, 0, 5
+"c:\Users\quant\Desktop\Gachon stuff\WebDB\itAPI\src\services\TEST.js", "JavaScript", 29, 0, 0, 5, 34
+"c:\Users\quant\Desktop\Gachon stuff\WebDB\itAPI\src\services\authServices.js", "JavaScript", 24, 0, 0, 2, 26
+"c:\Users\quant\Desktop\Gachon stuff\WebDB\itAPI\src\services\mapService.js", "JavaScript", 98, 0, 8, 7, 113
+"c:\Users\quant\Desktop\Gachon stuff\WebDB\itAPI\src\services\promptService.js", "JavaScript", 21, 0, 1, 2, 24
+"c:\Users\quant\Desktop\Gachon stuff\WebDB\itAPI\src\services\quizService.js", "JavaScript", 0, 0, 2, -1, 1
+"Total", "-", 195, 338, 12, 18, 563

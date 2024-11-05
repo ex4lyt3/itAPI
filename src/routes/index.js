@@ -1,0 +1,1 @@
+// consolidate all routes here instead of app

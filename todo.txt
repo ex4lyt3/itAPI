@@ -1,0 +1,11 @@
+find a way to combine the prompt response object and other details needed to save into the itinerary db table
+fix the getHighlights and getPlaces function -> if possible look at how to make the algorithm to find 'underrated' places
+complete itinerary comment and rating function/route
+make recommendation route
+test everything
+save secrets
+push to GitHub
+use domain name 
+host on amazon
+do blog
+do web db
