@@ -8,15 +8,23 @@ async function submitQuiz(reqBody) {
     const place = reqBody.place;
     const highlights = reqBody.highlights;
     const additionalOptions = reqBody.additionalOptions;
+    const cuisine = reqBody.cuisine + "_";
+    const popularity = reqBody.popularity;
+    const budget = reqBody.budget;
+    const username = reqBody.username;
+    if (place == null || highlights == null || cuisine == null || popularity == null || budget == null) {
+        throw new Error("Invalid request");
+    }
     // get more highlights based on area, popularity
-    // get restaurants, determined by cuisine, popularity and budget
-    let restaurants = await mapService.getHighlights(place,5,"restaurant", {popularity: "popular", budget: "low"}); //additionalOptions is a placeholder
-    // get place details from mapSeervice
+    let restaurants = await mapService.getHighlights(place, 5, `${cuisine}restaurant`, { popularity: popularity, budget: budget });
     const promptData = {
         place: place,
         highlights: highlights,
         restaurants: restaurants,
-        additionalOptions: additionalOptions
+        budget: budget,
+        popularity: popularity,
+        cuisine: cuisine,
+        username: reqBody.username
     }
     return promptData;
 }

@@ -5,24 +5,39 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             primaryKey: true,
         },
+        userid: { // Add userid column
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
         placesDescription: {
             type: DataTypes.STRING,
             allowNull: false,
             primaryKey: false
         },
-        preferences: {
-            type: DataTypes.STRING ,
+        popularity: {
+            type: DataTypes.ENUM('Underrated', 'Popular'),
             allowNull: false,
             primaryKey: false
-        }
-    })
+        },
+        budget: {
+            type: DataTypes.ENUM('low', 'high'),
+            allowNull: false,
+            primaryKey: false
+        },
+        cuisine: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            primaryKey: false
+        },
+        
+    });
 
     Itinerary.associate = (models) => {
-        Itinerary.belongsTo(models.User, {
+        Itinerary.belongsTo(models.user, {
             foreignKey: 'userid',
             onDelete: 'CASCADE'
         }),
-        Itinerary.hasMany(models.Comment, {
+        Itinerary.hasMany(models.comment, {
             foreignKey: 'itineraryid',
             as: 'comments',
         });

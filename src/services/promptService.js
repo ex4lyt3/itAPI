@@ -12,7 +12,9 @@ async function createItinerary(data) {
     place = data.place;
     highlights = data.highlights;
     restaurants = data.restaurants;
-    additionalOptions = data.additionalOptions;
+    budget = data.budget;
+    popularity = data.popularity;
+    cuisine = data.cuisine;
 
     console.log(typeof restaurants);
     for (let i = 0, len = restaurants.length; i < len; i++) {
@@ -28,7 +30,6 @@ async function createItinerary(data) {
                     Required Places of Interest: ${highlights}
                     Restaurants: ${restaurantsStr}
                     Remove the syntax markdown formatting.`
-    console.log(prompt)
 
     const completion = await openai.chat.completions.create({
         model: "gpt-4o-mini",
@@ -40,19 +41,17 @@ async function createItinerary(data) {
             },
         ],
     });
-    
-    console.log(completion.choices[0].message.content.trim());
+
     itineraryObject = JSON.parse(completion.choices[0].message.content.trim());
     const itineraryCount = await itinerary.count();
-    const itineraryId = itineraryCount + 1;
-    console.log("THE ITINERARY ID IS: " + itineraryId);
+    const itineraryId = itineraryCount;
     newItinerary = await itinerary.create({
-        itineraryid: itineraryId, // this is a placeholder
-        rating: NaN,
+        itineraryid: itineraryId,
         placesDescription: JSON.stringify(itineraryObject),
-        // how do i get the userid lmao
-        userid: authService.getUserId(data.username),
-        preferences: JSON.stringify(additionalOptions)
+        userid: await authService.getUserId(data.username),
+        popularity: popularity,
+        budget: budget,
+        cuisine: cuisine
     });
     return completion.choices[0].message.content.trim();
 }

@@ -14,15 +14,24 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: false,
             primaryKey: false
+        },
+        userid: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            primaryKey: false
+        },
+        itineraryid: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
         }
     })
 
     Comment.associate = (models) => {
-        Comment.belongsTo(models.Itinerary, {
+        Comment.belongsTo(models.itinerary, {
             foreignKey: 'itineraryid',
-            onDelete: 'CASCADE'
+            onDelete: 'CASCADE',
         }),
-        Comment.belongsTo(models.User, {
+        Comment.belongsTo(models.user, {
             foreignKey: 'userid',
             onDelete: 'CASCADE'
         });

@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     })
 
     Quiz.associate = (models) => {
-        Quiz.hasMany(models.Question, {
+        Quiz.hasMany(models.question, {
             foreignKey: 'quizversion',
             as: 'questions',
         });

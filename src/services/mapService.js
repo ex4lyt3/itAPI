@@ -36,7 +36,8 @@ const tempPlaceData = {
 }
 
 
-function getPlaces() {
+async function getPlaces() {
+    return tempPlaceData.districts;
     return place.findAll();
 }
 
@@ -66,67 +67,61 @@ async function getHighlights(place, number, type, additionalOptions) {
         }
       };
 
-    try {
-        const response = await axios.post(
-            placesUrl,
-            data,
-            { headers: {
-                'Content-Type': 'application/json',
-                'X-Goog-Api-Key': apiKey, // Replace with your actual API key
-                'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.websiteUri,places.rating,places.userRatingCount,places.priceLevel,places.regularOpeningHours,places.reviews,places.types,places.primaryType'
-              }
-            }
-        );
+    const response = await axios.post(
+        placesUrl,
+        data,
+        { headers: {
+            'Content-Type': 'application/json',
+            'X-Goog-Api-Key': apiKey, // Replace with your actual API key
+            'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.websiteUri,places.rating,places.userRatingCount,places.priceLevel,places.regularOpeningHours,places.reviews,places.types,places.primaryType'
+          }
+        }
+    );
 
-        let actualResponse = [];
-        // determine popularity
-        // check if is restaurant or POI
-        if (additionalOptions.popularity === "popular") {
-            for (let i = 0; i < response.data.places.length; i++) {
-                console.log(response.data.places[i].userRatingCount, response.data.places[i].rating);
-                if (response.data.places[i].userRatingCount > 30 && response.data.places[i].rating > 4) {
-                    actualResponse.push(response.data.places[i]);
-                }
-            }
-        } else if (additionalOptions.popularity === "underrated") {
-            for (let i = 0; i < response.data.places.length; i++) {
-                if (response.data.places[i].userRatingCount < 30 && response.data.places[i].rating > 4) {
-                    actualResponse.push(response.data.places[i]);
-                }
+    let actualResponse = [];
+    // determine popularity
+    // check if is restaurant or POI
+    if (additionalOptions.popularity === "popular") {
+        for (let i = 0; i < response.data.places.length; i++) {
+            if (response.data.places[i].userRatingCount > 30 && response.data.places[i].rating > 4) {
+                actualResponse.push(response.data.places[i]);
             }
         }
-        // check for restaurants and its price
-        if (type.includes('restaurant')) {
-            const cuisineType = type.split('_')[0];
-            console.log(cuisineType);
-            if (cuisineType != "restaurant") {
-                actualResponse = actualResponse.filter(place => place.types.includes(`${cuisineType}_restaurant`));
-            } else {
-                actualResponse = actualResponse.filter(place => place.types.includes('restaurant'));
+    } else if (additionalOptions.popularity === "underrated") {
+        for (let i = 0; i < response.data.places.length; i++) {
+            if (response.data.places[i].userRatingCount < 30 && response.data.places[i].rating > 4) {
+                actualResponse.push(response.data.places[i]);
             }
-                if (additionalOptions.budget === "high") {   
-                    for (let i = 0; i < actualResponse.length; i++)  {
-                        if (actualResponse[i].priceLevel == "PRICE_LEVEL_EXPENSIVE" || actualResponse[i].priceLevel == "PRICE_LEVEL_MODERATE" || actualResponse[i].priceLevel == "PRICE_LEVEL_VERY_EXPENSIVE") {
-                            actualResponse.splice(i, 1);
-                        }
-                    }
-                } else if (additionalOptions.budget === "low") {
-                    for (let i = 0; i < actualResponse.length; i++)  {
-                        if (actualResponse[i].priceLevel == "PRICE_LEVEL_INEXPENSIVE" || actualResponse[i].priceLevel == "PRICE_LEVEL_FREE") {
-                            actualResponse.splice(i, 1);
-                        }
-                    }
-                }
         }
-        // check for POIs/Highlights
-        // can further split into tourist attractions and historical landmarks
-        if (type.includes('highlights')) {
-            actualResponse = actualResponse.filter(place => place.types.includes('tourist_attraction') || place.types.includes('historical_landmark'));
-        }
-        return actualResponse.slice(0, number);
-    } catch (error) {
-        console.log(error);
     }
+    // check for restaurants and its price
+    if (type.includes('restaurant')) {
+        const cuisineType = type.split('_')[0];
+        if (cuisineType != "restaurant") {
+            actualResponse = actualResponse.filter(place => place.types.includes(`${cuisineType}_restaurant`));
+        } else {
+            actualResponse = actualResponse.filter(place => place.types.includes('restaurant'));
+        }
+            if (additionalOptions.budget === "high") {   
+                for (let i = 0; i < actualResponse.length; i++)  {
+                    if (actualResponse[i].priceLevel == "PRICE_LEVEL_EXPENSIVE" || actualResponse[i].priceLevel == "PRICE_LEVEL_MODERATE" || actualResponse[i].priceLevel == "PRICE_LEVEL_VERY_EXPENSIVE") {
+                        actualResponse.splice(i, 1);
+                    }
+                }
+            } else if (additionalOptions.budget === "low") {
+                for (let i = 0; i < actualResponse.length; i++)  {
+                    if (actualResponse[i].priceLevel == "PRICE_LEVEL_INEXPENSIVE" || actualResponse[i].priceLevel == "PRICE_LEVEL_FREE") {
+                        actualResponse.splice(i, 1);
+                    }
+                }
+            }
+    }
+    // check for POIs/Highlights
+    // can further split into tourist attractions and historical landmarks
+    if (type.includes('highlights')) {
+        actualResponse = actualResponse.filter(place => place.types.includes('tourist_attraction') || place.types.includes('historical_landmark'));
+    }
+    return actualResponse.slice(0, number);
 }
 
 module.exports = {

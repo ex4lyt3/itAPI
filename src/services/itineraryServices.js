@@ -3,69 +3,84 @@ const authServices = require('../services/authServices');
 const db = require('../models');
 const itinerary = db.itinerary;
 const comment = db.comment;
+const { Op } = require("sequelize");
 
-async function commentItinerary(itineraryInformation) {
-    const itineraryId = req.body.itineraryId;
+async function viewItinerary(req) {
+    const token = req.headers['authorization'];
+    // const username = await authServices.getUsername(token);
+    const username = "user"
+    const userid = await authServices.getUserId(username);
+    console.log(userid);
+
+    const itineraries = await itinerary.findAll({
+        where: {
+            userid: userid
+        }
+    });
+    return itineraries;
+}
+
+async function commentItinerary(req) {
+    const itineraryId = req.body.itineraryid;
     const commentText = req.body.comment;
     const rating = req.body.rating;
-    const username = authServices.getUsername(req.headers.authorization);
+    const userid = await authServices.getUserId(req.body.username);
     if (rating < 0 || rating > 5) {
         return "Error";
     }
-    try {
-        const newComment = await comment.create({
-            itineraryId: itineraryId,
-            comment: commentText,
-            username: username,
-            rating: rating,
-        });
-        return "Success";
-    } catch (error) {
-        console.error(error);
-        return "Error";
-    }
+
+    const newComment = await comment.create({
+        commentid: Math.floor(Math.random() * 1000000),
+        itineraryid: itineraryId,
+        comment: commentText,
+        rating: rating,
+        userid: userid
+    });
+    return "Success";
 }
 
 async function getRating(itineraryId) {
-    try {
-        const comments = await comment.findAll({
-            where: {
-                itineraryId: itineraryId
-            }
-        });
-        let totalRating = 0;
-        for (let i = 0, len = comments.length; i < len; i++) {
-            totalRating += comments[i].rating;
+    const comments = await comment.findAll({
+        where: {
+            itineraryid: itineraryId
         }
-        return totalRating / comments.length;
-    } catch (error) {
-        console.error(error);
-        return "Error";
+    });
+    let totalRating = 0;
+    for (let i = 0, len = comments.length; i < len; i++) {
+        console.log(typeof comments[i].rating);
+        totalRating += comments[i].rating;
     }
+    console.log(totalRating / comments.length);
+    return totalRating / comments.length;
 }
 
 async function getRecommendation(preferences) {
     const popularity = preferences.popularity;
-    const budget = preferences.budget;;
-    try {
-        const itineraries = await itinerary.findAll({
-            where: {
-                preferences: {
-                    budget: budget,
-                    popularity: popularity
-                }
-            }
-        });
-        let recommendedItineraries = [];
-        for (let i = 0, len = itineraries.length; i < len; i++) {
-            const currentRating = await getRating(itineraries[i].itineraryId);
-            if (currentRating >= rating) {
-                recommendedItineraries.push(itineraries[i]);
-            }
+    const budget = preferences.budget;
+    const preferredRating = 4;
+    // filter rating > 4 first
+
+    const itineraries = await itinerary.findAll({
+        where: {
+            popularity: popularity,
+            budget: budget
         }
-        return recommendedItineraries;
-    } catch (error) {
-        console.error(error);
-        return "Error";
+    });
+    let recommendedItineraries = [];
+    for (let i = 0, len = itineraries.length; i < len; i++) {
+        console.log(itineraries[i].itineraryid);
+        const currentRating = await getRating(itineraries[i].itineraryid);
+        console.log(currentRating);
+        if (currentRating >= preferredRating) {
+            recommendedItineraries.push(itineraries[i]);
+        }
+        console.log(recommendedItineraries);
     }
+    return recommendedItineraries;
+}
+
+module.exports = {
+    viewItinerary,
+    commentItinerary,
+    getRecommendation
 }

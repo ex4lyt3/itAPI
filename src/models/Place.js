@@ -39,7 +39,7 @@ module.exports = (sequelize, DataTypes) => {
     })
 
     Place.associate = (models) => {
-        Place.belongsTo(models.Itinerary, {
+        Place.belongsTo(models.itinerary, {
             foreignKey: 'itineraryid',
             onDelete: 'CASCADE'
         })
