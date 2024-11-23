@@ -8,7 +8,7 @@ const { Op } = require("sequelize");
 async function viewItinerary(req) {
     const token = req.headers['authorization'];
     // const username = await authServices.getUsername(token);
-    const username = "user"
+    const username = req.body.username;
     const userid = await authServices.getUserId(username);
     console.log(userid);
 
@@ -17,7 +17,27 @@ async function viewItinerary(req) {
             userid: userid
         }
     });
-    return itineraries;
+    
+    return itineraries; 
+}
+
+async function getItinerary(itineraryId) {
+    const specificItinerary = await itinerary.findOne({
+        where: {
+            itineraryid: itineraryId
+        }
+    });
+    if (specificItinerary == null) {
+        throw new Error("Itinerary not found");
+    }
+
+    specificItinerary.rating = await getRating(specificItinerary.itineraryid);
+    if (specificItinerary.rating == NaN) {
+        specificItinerary.dataValues.rating = "Unrated";
+    }
+    // Append rating to specificItinerary
+    specificItinerary.dataValues.rating = specificItinerary.rating;
+    return specificItinerary;
 }
 
 async function commentItinerary(req) {
@@ -37,6 +57,19 @@ async function commentItinerary(req) {
         userid: userid
     });
     return "Success";
+}
+
+async function getComments(itineraryId) {
+    const comments = await comment.findAll({
+        where: {
+            itineraryid: itineraryId
+        }
+    });
+    for (let i = 0, len = comments.length; i < len; i++) {
+        const username = await authServices.getUsername(comments[i].userid);
+        comments[i].dataValues.username = username;
+    }
+    return comments;
 }
 
 async function getRating(itineraryId) {
@@ -82,5 +115,7 @@ async function getRecommendation(preferences) {
 module.exports = {
     viewItinerary,
     commentItinerary,
-    getRecommendation
+    getRecommendation,
+    getComments,
+    getItinerary
 }

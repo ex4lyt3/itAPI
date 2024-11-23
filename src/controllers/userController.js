@@ -39,9 +39,20 @@ async function refreshToken(req, res, next) {
     }
 }
 
+async function getUsername(req, res, next) {
+    try {
+        const username = await authServices.getUsername(req.body.userid);
+        console.log(username)
+        res.json(username);
+    } catch (error) {
+        next(error);
+    }
+}
+
 module.exports = {
     create,
     authenticate,
     logout,
-    refreshToken
+    refreshToken,
+    getUsername
 }

@@ -23,7 +23,7 @@ async function createItinerary(data) {
         }
     }
     const restaurantsStr = JSON.stringify(restaurants);
-    const prompt = `Could you generate me an itinerary that is based on the relevant information? There must be lunch and dinner with sightseeing or relevant tourist activities to fill in between the schedule. ONLY use the details provided and nothing else. The answer must be formatted in JSON format, whereby it consists of TimeSlot object {time: "", duration: "", type: "", place: "", details: ""}. Each timeslot object will consist of the time, duration, type of activity (eating/sightseeing/etc), places specifically and the details of the place of interest relevant to that timeslot. Reply only with the JSON object.
+    const prompt = `Could you generate me an itinerary that is based on the relevant information? There must be lunch and dinner with sightseeing or relevant tourist activities to fill in between the schedule. ONLY use the details provided and nothing else. The answer must be formatted in JSON format, whereby it consists of TimeSlot object {time: "", duration: "", type: "", place: "", details: ""}. Each timeslot object will consist of the time (always use 2400 format), duration, type of activity (eating/sightseeing/etc), places specifically and the details of the place of interest relevant to that timeslot. Reply only with the JSON object.
 
                     Here is the relevant information (ONLY USE THIS):
                     District: ${place}
@@ -34,7 +34,7 @@ async function createItinerary(data) {
     const completion = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: [
-            { role: "system", content: "You are a helpful assistant." },
+            { role: "system", content: "You are a helpful assistant. Always reply in JSON format." },
             {
                 role: "user",
                 content: prompt,
@@ -53,7 +53,7 @@ async function createItinerary(data) {
         budget: budget,
         cuisine: cuisine
     });
-    return completion.choices[0].message.content.trim();
+    return itineraryId;
 }
 
 module.exports = {

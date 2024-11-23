@@ -32,9 +32,29 @@ async function viewItinerary(req, res, next) {
     }
 }
 
+async function viewSpecificItinerary(req, res, next) {
+    try {
+        const itineraries = await itineraryService.getItinerary(req.body.itineraryid);
+        res.status(200).send(itineraries);
+    } catch (error) {
+        next(error);
+    }
+}
+
+async function viewComments(req, res, next) {
+    try {
+        const comments = await itineraryService.getComments(req.body.itineraryid);
+        res.status(200).send(comments);
+    } catch (error) {
+        next(error);
+    }
+}
+
 module.exports = {
     create,
     commentItinerary,
     recommendItinerary,
-    viewItinerary
+    viewItinerary,
+    viewComments,
+    viewSpecificItinerary
 };

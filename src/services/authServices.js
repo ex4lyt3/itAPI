@@ -60,11 +60,16 @@ async function authenticate(body) {
     }
 }
 
-async function getUsername(token) {
-    jwt.verify(token, TOKEN_SECRET, (err, user) => {
-        return user.username;
-        return false;
+async function getUsername(userid) {
+    console.log(typeof userid)
+    const user = await User.findOne({
+        where: {
+            userid: parseInt(userid)
+        }
     })
+    console.log("user: " + user.username);
+
+    return user.username;
 }
 
 function logout(body) {

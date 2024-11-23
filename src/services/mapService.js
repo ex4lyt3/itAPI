@@ -53,19 +53,34 @@ async function getHighlights(place, number, type, additionalOptions) {
     // uses nearbysearch on station to retrieve highlights
 
     const placesUrl = `https://places.googleapis.com/v1/places:searchNearby`;
-    
-    const data = {
-        includedTypes: ["restaurant"],
-        locationRestriction: {
-          circle: {
-            center: {
-              latitude: lat,
-              longitude: long,
-            },
-            radius: 500.0
-          }
-        }
-      };
+    let data = {};
+    if (type.includes('restaurant')) {
+         data = {
+            includedTypes: ["restaurant"],
+            locationRestriction: {
+            circle: {
+                center: {
+                latitude: lat,
+                longitude: long,
+                },
+                radius: 500.0
+            }
+            }
+        };
+    } else if (type.includes('highlights')) {
+         data = {
+            includedTypes: ["tourist_attraction", "historical_landmark"],
+            locationRestriction: {
+            circle: {
+                center: {
+                latitude: lat,
+                longitude: long,
+                },
+                radius: 5000.0
+            }
+            }
+        };
+    }
 
     const response = await axios.post(
         placesUrl,
@@ -73,7 +88,7 @@ async function getHighlights(place, number, type, additionalOptions) {
         { headers: {
             'Content-Type': 'application/json',
             'X-Goog-Api-Key': apiKey, // Replace with your actual API key
-            'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.websiteUri,places.rating,places.userRatingCount,places.priceLevel,places.regularOpeningHours,places.reviews,places.types,places.primaryType'
+            'X-Goog-FieldMask': 'places.id,places.displayName,places.rating,places.userRatingCount,places.priceLevel,places.types,places.primaryType,places.editorialSummary'
           }
         }
     );
@@ -90,6 +105,12 @@ async function getHighlights(place, number, type, additionalOptions) {
     } else if (additionalOptions.popularity === "underrated") {
         for (let i = 0; i < response.data.places.length; i++) {
             if (response.data.places[i].userRatingCount < 30 && response.data.places[i].rating > 4) {
+                actualResponse.push(response.data.places[i]);
+            }
+        }
+    } else if (additionalOptions.popularity === "mixed") {
+        for (let i = 0; i < response.data.places.length; i++) {
+            if (response.data.places[i].rating) {
                 actualResponse.push(response.data.places[i]);
             }
         }
@@ -120,13 +141,32 @@ async function getHighlights(place, number, type, additionalOptions) {
     // can further split into tourist attractions and historical landmarks
     if (type.includes('highlights')) {
         actualResponse = actualResponse.filter(place => place.types.includes('tourist_attraction') || place.types.includes('historical_landmark'));
-    }
-    return actualResponse.slice(0, number);
+    };
+    return actualResponse;
+}
+
+async function getHighlightsPhoto(placeid) {
+    const placesUrl = `https://places.googleapis.com/v1/places/${placeid}`
+    const response = await axios.get(
+        placesUrl,
+        { headers: {
+            'Content-Type': 'application/json',
+            'X-Goog-Api-Key': apiKey, // Replace with your actual API key
+            'X-Goog-FieldMask': 'photos'
+          }
+        }
+    );
+    console.log(response)
+    const photosUrl = `https://places.googleapis.com/v1/${response.data.photos[0].name}/media?key=${apiKey}&maxHeightPx=600&maxWidthPx=600`
+    const photosResponse = await axios.get(photosUrl);
+
+    return photosUrl;
 }
 
 module.exports = {
     getPlaces,
-    getHighlights
+    getHighlights,
+    getHighlightsPhoto
 }
 
 //ignorethis

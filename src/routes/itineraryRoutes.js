@@ -10,5 +10,7 @@ if (!itineraryController.commentItinerary || !itineraryController.recommendItine
 router.post('/comment', itineraryController.commentItinerary);
 router.post('/recommend', itineraryController.recommendItinerary); // similar to quiz, but after taking preferences
 router.post('/view', itineraryController.viewItinerary); // view itinerary
+router.post('/viewSpecific', itineraryController.viewSpecificItinerary); // view specific itinerary
+router.post('/viewComments', itineraryController.viewComments); // view comments of an itinerary
 
 module.exports = router;
